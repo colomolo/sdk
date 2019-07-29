@@ -31,9 +31,9 @@ app.post('/v1/payments', (req, res) => {
   try {
     validateFields(req.body)
     
-    res.status(200).json(payments[0])
+    return res.status(200).json(payments[0])
   } catch (e) {
-    res.status(400).json(e.json)
+    return res.status(400).json(e.json)
   }
 })
 
@@ -44,16 +44,16 @@ app.get('/v1/payments/:id', (req, res) => {
 })
 
 app.put('/v1/payments/:id/approve', (req, res) => {
-  const payment = payments.find(payment => payment.id === req.params.id)
-
   try {
+    const payment = payments.find(payment => payment.id === req.params.id)
+
     if (payment.status === 'cancelled')
       throwErrorWithCode('Cannot approve a payment that has already been cancelled', 'ERR_CANNOT_APPROVE')
   } catch (e) {
-    res.status(400).json(e.json)
+    return res.status(400).json(e.json)
   }
 
-  res.sendStatus(200)
+  return res.sendStatus(200)
 })
 
 app.put('/v1/payments/:id/cancel', (req, res) => {
@@ -63,10 +63,10 @@ app.put('/v1/payments/:id/cancel', (req, res) => {
     if (payment.status === 'approved')
       throwErrorWithCode('"Cannot cancel a payment that has already been approved', 'ERR_CANNOT_CANCEL')
   } catch (e) {
-    res.status(400).json(e.json)
+    return res.status(400).json(e.json)
   }
 
-  res.sendStatus(200)
+  return res.sendStatus(200)
 })
 
 module.exports = app
