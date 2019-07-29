@@ -56,51 +56,35 @@ beforeAll((done) => {
 })
 afterAll(done => app.close(done))
 
-test('POST /v1/authenticate returns auth token', (done) => {
+test('POST /v1/authenticate returns auth token', () => {
   return authenticate()
-    .then((json) => {
-      expect(json.authToken).toBeTruthy()
-      done()
-    })
-    .catch(done.fail)
+    .then(json => expect(json.authToken).toBeTruthy())
 })
 
-test('GET /v1/payments without access token returns error', (done) => {
+test('GET /v1/payments without access token returns error', () => {
   return request(`${url('/v1/payments')}`)
-    .then(done.fail)
-    .catch((e) => {
-      expect(e.statusCode).toEqual(401)
-      done()
-    })
+    .catch(e => expect(e.statusCode).toEqual(401))
 })
 
-test('GET /v1/payments with access token returns payments list', (done) => {
+test('GET /v1/payments with access token returns payments list', () => {
   return request({
     uri: url('/v1/payments'),
     qs: { access_token: token },
     json: true,
   })
-    .then((json) => {
-      expect(json).toMatchObject(payments)
-      done()
-    })
-    .catch(done.fail)
+    .then(json => expect(json).toMatchObject(payments))
 })
 
-test('GET /v1/payments/1 with access token returns payment with id=1', (done) => {
+test('GET /v1/payments/1 with access token returns payment with id=1', () => {
   return request({
     uri: url('/v1/payments/1'),
     qs: { access_token: token },
     json: true,
   })
-    .then((json) => {
-      expect(json).toMatchObject(payments.find(payment => payment.id === '1'))
-      done()
-    })
-    .catch(done.fail)
+    .then(json => expect(json).toMatchObject(payments.find(payment => payment.id === '1')))
 })
 
-test('POST /v1/payments with access token returns payments list', (done) => {
+test('POST /v1/payments with access token returns payments list', () => {
   return request({
     method: 'POST',
     uri: url('/v1/payments'),
@@ -110,45 +94,25 @@ test('POST /v1/payments with access token returns payments list', (done) => {
     body: paymentMock,
     json: true,
   })
-    .then((json) => {
-      expect(json).toMatchObject(payments[0])
-      done()
-    })
-    .catch(done.fail)
+    .then(json => expect(json).toMatchObject(payments[0]))
 })
 
-test('PUT /v1/payments/1/approve approves payment with id=1', (done) => {
+test('PUT /v1/payments/1/approve approves payment with id=1', () => {
   return PUTRequest(url('/v1/payments/1/approve'), token)
-    .then((res) => {
-      expect(res).toEqual('OK')
-      done()
-    })
-    .catch(done.fail)
+    .then(res => expect(res).toEqual('OK'))
 })
 
-test('PUT /v1/payments/2/approve cannot approve payment with id=2', (done) => {
+test('PUT /v1/payments/2/approve cannot approve payment with id=2', () => {
   return PUTRequest(url('/v1/payments/2/approve'), token)
-    .then(done.fail)
-    .catch((e) => {
-      expect(e.statusCode).toEqual(400)
-      done()
-    })
+    .catch(e => expect(e.statusCode).toEqual(400))
 })
 
-test('PUT /v1/payments/1/cancel cancels payment with id=1', (done) => {
+test('PUT /v1/payments/1/cancel cancels payment with id=1', () => {
   return PUTRequest(url('/v1/payments/1/cancel'), token)
-    .then((res) => {
-      expect(res).toEqual('OK')
-      done()
-    })
-    .catch(done.fail)
+    .then(res => expect(res).toEqual('OK'))
 })
 
-test('PUT /v1/payments/3/cancel cannot cancel payment with id=3', (done) => {
+test('PUT /v1/payments/3/cancel cannot cancel payment with id=3', () => {
   return PUTRequest(url('/v1/payments/3/cancel'), token)
-    .then(done.fail)
-    .catch((e) => {
-      expect(e.statusCode).toEqual(400)
-      done()
-    })
+    .catch(e => expect(e.statusCode).toEqual(400))
 })
