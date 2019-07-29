@@ -8,6 +8,8 @@ const validateFields = require('./utils/validateFields')
 
 const payments = require('./dbStubs').payments
 
+const getPayment = id => payments.find(payment => payment.id === id)
+
 app.use(express.json())
 
 app.post('/v1/authenticate', (req, res) => {
@@ -38,14 +40,14 @@ app.post('/v1/payments', (req, res) => {
 })
 
 app.get('/v1/payments/:id', (req, res) => {
-  const payment = payments.find(payment => payment.id === req.params.id)
+  const payment = getPayment(req.params.id)
 
   res.status(200).json(payment)
 })
 
 app.put('/v1/payments/:id/approve', (req, res) => {
   try {
-    const payment = payments.find(payment => payment.id === req.params.id)
+    const payment = getPayment(req.params.id)
 
     if (payment.status === 'cancelled')
       throwErrorWithCode('Cannot approve a payment that has already been cancelled', 'ERR_CANNOT_APPROVE')
@@ -57,9 +59,9 @@ app.put('/v1/payments/:id/approve', (req, res) => {
 })
 
 app.put('/v1/payments/:id/cancel', (req, res) => {
-  const payment = payments.find(payment => payment.id === req.params.id)
-
   try {
+    const payment = getPayment(req.params.id)
+
     if (payment.status === 'approved')
       throwErrorWithCode('"Cannot cancel a payment that has already been approved', 'ERR_CANNOT_CANCEL')
   } catch (e) {
